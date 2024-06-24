@@ -117,7 +117,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/home',
       routes: {
         '/home': (context) =>
-            const RenderPage(pageData: {"pageName": "index.json"}), 
+            const RenderPage(pageData: {"pageName": "index.json"}, registry), 
             /* 
               you can also add page data that is to be added to registry, 
                 example: 

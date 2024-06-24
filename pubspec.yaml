@@ -1,7 +1,7 @@
 name: fetch_pages
-description: "Flutter package to fetch json pages for json_dynamic_widget from server."
-version: 0.0.1
-homepage:
+description: "Flutter package to fetch and render json pages for json_dynamic_widget from server."
+version: 0.1.2
+homepage: https://github.com/Jeevan-Rai/fetch_pages/
 
 environment:
   sdk: '>=3.2.5 <4.0.0'
@@ -10,9 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences:
-  http: ^1.2.0
-  logger:
+  http: ^0.13.3
+  logger: ^1.0.0
+  shared_preferences: ^2.0.6
+  json_dynamic_widget: ^7.0.1
 
 dev_dependencies:
   flutter_test:
