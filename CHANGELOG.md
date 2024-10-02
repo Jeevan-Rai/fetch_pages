@@ -20,3 +20,7 @@
 * Added version check before fetching pages, comparing local and server `versionConfig.json`.
 * Updated Express API route for serving `versionConfig.json`.
 * Optimized caching using `SharedPreferences` to store versioning data and page responses.
+
+### 1.0.1
+
+* Bug fix - resolved issue in getting page from cache

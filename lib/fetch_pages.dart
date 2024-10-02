@@ -57,7 +57,7 @@ class FetchPages {
         final response = await http.get(Uri.parse(url));
         if (response.statusCode == 200) {
           responseData = json.decode(response.body);
-          pref.setString("responseBodyFromAPI", response.body);
+          pref.setString("responseBody", response.body);
           logger.i("Fetched pages from API successfully!");
           try {
             final String? response =
@@ -75,6 +75,9 @@ class FetchPages {
         } else {
           logger.e("Error fetching page data from API ${response.body}");
         }
+      } else {
+        logger.i("Else if not to fetch pages");
+        responseData = json.decode(pref.getString('responseBody')!);
       }
     } catch (e) {
       logger.e("Exception while fetching pages from API: $e");
