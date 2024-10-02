@@ -13,3 +13,10 @@
 ### 0.1.2
 
 * Bug fix - resolved conflicts by multiple registry creation.
+
+### 1.0.0
+
+* Introduced versioning system to minimize unnecessary API requests.
+* Added version check before fetching pages, comparing local and server `versionConfig.json`.
+* Updated Express API route for serving `versionConfig.json`.
+* Optimized caching using `SharedPreferences` to store versioning data and page responses.
