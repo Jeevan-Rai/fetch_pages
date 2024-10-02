@@ -1,9 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:mockito/mockito.dart';
-import 'package:your_package/fetch_pages.dart'; // Import your package
+import 'package:fetch_pages/fetch_pages.dart'; // Import your package
 
 class MockClient extends Mock implements http.Client {}
 
@@ -27,7 +26,9 @@ void main() {
       when(mockClient.get(Uri.parse('https://106.51.72.98:3004/version-config/MyBT')))
           .thenAnswer((_) async => http.Response('{"pageName": "testPage"}', 200));
 
-      await FetchPages.fetchPagesFromAPI('https://106.51.72.98:3004/version-config/MyBT');
+      await FetchPages.fetchPagesFromAPI(
+          'https://106.51.72.98:3004/pages/MyBT',
+          'https://106.51.72.98:3004/version-config/MyBT');
       
       // Verify SharedPreferences is updated
       expect(prefs.getString('responseBodyFromAPI'), '{"pageName": "testPage"}');
