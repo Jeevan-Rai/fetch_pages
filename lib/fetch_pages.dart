@@ -12,28 +12,63 @@ class FetchPages {
   static Future<void> fetchPagesFromAPI(String url) async {
     try {
       final SharedPreferences pref = await SharedPreferences.getInstance();
-      if (pref.getString("responseBodyFromAPI") != null) {
-        responseData = json.decode(pref.getString("responseBodyFromAPI")!);
-      }
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        responseData = json.decode(response.body);
-        pref.setString("responseBodyFromAPI", response.body);
-        logger.i("Fetched pages from API successfully!");
-      } else if (pref.getString('responseBody') != null) {
-        responseData = pref.getString('responseBody');
-        logger
-            .w("Error fetching pages from API, loaded from sharedPreferences");
+      final localVersionConfig = pref.getString("versionConfig");
+      bool shouldFetchPages = false;
+
+      // Extract dirName from the URL (after the last '/')
+      final dirName = url.split('/').last;
+      logger.i("Directory name extracted: $dirName");
+
+      if (localVersionConfig != null) {
+        final localVersionData = json.decode(localVersionConfig);
+        logger.i("Local versionConfig found.");
+
+        // Fetch versionConfig.json from the server with dirName
+        final versionResponse = await http.get(Uri.parse('$url/version-config/$dirName'));
+        if (versionResponse.statusCode == 200) {
+          final serverVersionData = json.decode(versionResponse.body);
+          final localVersion = localVersionData['version'];
+          final serverVersion = serverVersionData['version'];
+
+          logger.i("Local version: $localVersion, Server version: $serverVersion");
+
+          // Compare versions
+          if (localVersion < serverVersion) {
+            logger.i("Local version is outdated. Fetching pages...");
+            shouldFetchPages = true;
+            pref.setString("versionConfig", versionResponse.body); // Update the versionConfig in sharedPrefs
+          } else {
+            logger.i("Versions match. No need to fetch pages.");
+          }
+        } else {
+          logger.e("Error fetching versionConfig from server: ${versionResponse.body}");
+        }
       } else {
-        logger.e("Error fetching page data from API ${response.body}");
+        logger.i("No local versionConfig found. Fetching pages...");
+        shouldFetchPages = true;
+      }
+
+      // Fetch pages only if necessary
+      if (shouldFetchPages) {
+        final response = await http.get(Uri.parse('$url/pages/$dirName'));
+        if (response.statusCode == 200) {
+          responseData = json.decode(response.body);
+          pref.setString("responseBodyFromAPI", response.body);
+          logger.i("Fetched pages from API successfully!");
+        } else if (pref.getString('responseBody') != null) {
+          responseData = json.decode(pref.getString('responseBody')!);
+          logger.w("Error fetching pages from API, loaded from sharedPreferences");
+        } else {
+          logger.e("Error fetching page data from API ${response.body}");
+        }
       }
     } catch (e) {
-      logger.e("Exception while fetching pages from API $e");
+      logger.e("Exception while fetching pages from API: $e");
     }
   }
 
   static Future<String?> getPageByName(String name) async {
-    if (responseData[name] != null) {
+    if (responseData != null && responseData[name] != null) {
       logger.i("Fetched $name successfully!");
       return json.encode(responseData[name]);
     }
