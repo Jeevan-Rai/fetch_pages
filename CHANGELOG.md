@@ -24,3 +24,7 @@
 ### 1.0.1
 
 * Bug fix - resolved issue in getting page from cache
+
+### 1.0.2
+
+* Bug fix - can use x.x.x for versioning in versionConfig.json

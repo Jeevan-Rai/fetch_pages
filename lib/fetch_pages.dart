@@ -33,7 +33,7 @@ class FetchPages {
               "Local version: $localVersion, Server version: $serverVersion");
 
           // Compare versions
-          if (double.parse(localVersion) < double.parse(serverVersion)) {
+          if (localVersion != serverVersion) {
             logger.i("Local version is outdated. Fetching pages...");
             shouldFetchPages = true;
             pref.setString(
