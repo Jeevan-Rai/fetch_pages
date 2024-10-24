@@ -10,30 +10,26 @@ class FetchPages {
   static final logger = Logger();
   static var responseData;
   static Future<void> fetchPagesFromAPI(
-      String url, String versionCheckURL) async {
+      String url, String appVersion) async {
     try {
       final SharedPreferences pref = await SharedPreferences.getInstance();
       final localVersionConfig = pref.getString("versionConfig");
       bool shouldFetchPages = false;
-
-      logger.i("Url: $url :: VersionURL: $versionCheckURL");
-
+      logger.i("Url: $url :: appVersion: $appVersion");
       if (localVersionConfig != null) {
         final localVersionData = json.decode(localVersionConfig);
         logger.i("Local versionConfig found.");
-
-        // Fetch versionConfig.json from the server with dirName
-        final versionResponse = await http.get(Uri.parse(versionCheckURL));
+        // Fetch versionMapping.json from the server with appVersion to get JSON version and dirName
+        logger.i("Version Mapping URL :: $url/version-mapping/$appVersion");
+        final versionResponse = await http.get(Uri.parse("$url/version-mapping/$appVersion"));
         if (versionResponse.statusCode == 200) {
           final serverVersionData = json.decode(versionResponse.body);
           final localVersion = localVersionData['version'];
           final serverVersion = serverVersionData['version'];
-
           logger.i(
               "Local version: $localVersion, Server version: $serverVersion");
-
           // Compare versions
-          if (double.parse(localVersion) < double.parse(serverVersion)) {
+          if (localVersion != serverVersion) {
             logger.i("Local version is outdated. Fetching pages...");
             shouldFetchPages = true;
             pref.setString(
@@ -54,7 +50,11 @@ class FetchPages {
 
       // Fetch pages only if necessary
       if (shouldFetchPages) {
-        final response = await http.get(Uri.parse(url));
+        final localVersionConfig = pref.getString("versionConfig");
+        final localVersionData = json.decode(localVersionConfig!);
+        String folderName = localVersionData['folderName'];
+        logger.i("Fetch pages URL :: $url/pages/$folderName");
+        final response = await http.get(Uri.parse("$url/pages/$folderName"));
         if (response.statusCode == 200) {
           responseData = json.decode(response.body);
           pref.setString("responseBody", response.body);
