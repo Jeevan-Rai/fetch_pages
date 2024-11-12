@@ -1,6 +1,6 @@
 name: fetch_pages
 description: "Flutter package to fetch and render json pages for json_dynamic_widget from server."
-version: 1.0.2
+version: 1.2.1
 homepage: https://github.com/Jeevan-Rai/fetch_pages/
 
 environment:

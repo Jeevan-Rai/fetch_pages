@@ -9,33 +9,34 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FetchPages {
   static final logger = Logger();
   static var responseData;
-  static Future<void> fetchPagesFromAPI(
-      String url, String appVersion) async {
+  static Future<void> fetchPagesFromAPI(String url, String appVersion) async {
     try {
       final SharedPreferences pref = await SharedPreferences.getInstance();
       final localVersionConfig = pref.getString("versionConfig");
       bool shouldFetchPages = false;
       logger.i("Url: $url :: appVersion: $appVersion");
+
+      // Fetch versionMapping.json from the server with appVersion to get JSON version and dirName
+      logger.i("Version Mapping URL :: $url/version-mapping/$appVersion");
+      final versionResponse =
+          await http.get(Uri.parse("$url/version-mapping/$appVersion"));
+      pref.setString("versionConfig",
+          versionResponse.body); // Update the versionConfig in sharedPrefs
+          
       if (localVersionConfig != null) {
         final localVersionData = json.decode(localVersionConfig);
         logger.i("Local versionConfig found.");
-        // Fetch versionMapping.json from the server with appVersion to get JSON version and dirName
-        logger.i("Version Mapping URL :: $url/version-mapping/$appVersion");
-        final versionResponse = await http.get(Uri.parse("$url/version-mapping/$appVersion"));
         if (versionResponse.statusCode == 200) {
           final serverVersionData = json.decode(versionResponse.body);
           final localVersion = localVersionData['version'];
           final serverVersion = serverVersionData['version'];
           logger.i(
               "Local version: $localVersion, Server version: $serverVersion");
+
           // Compare versions
           if (localVersion != serverVersion) {
             logger.i("Local version is outdated. Fetching pages...");
             shouldFetchPages = true;
-            pref.setString(
-                "versionConfig",
-                versionResponse
-                    .body); // Update the versionConfig in sharedPrefs
           } else {
             logger.i("Versions match. No need to fetch pages.");
           }
@@ -59,15 +60,6 @@ class FetchPages {
           responseData = json.decode(response.body);
           pref.setString("responseBody", response.body);
           logger.i("Fetched pages from API successfully!");
-          try {
-            final String? response =
-                await FetchPages.getPageByName("versionConfig.json");
-            pref.setString("versionConfig", response!);
-            logger.i(
-                "got versionConfig from server updated to cache :: $response");
-          } catch (e) {
-            logger.i("versionConfig not fetched from the server");
-          }
         } else if (pref.getString('responseBody') != null) {
           responseData = json.decode(pref.getString('responseBody')!);
           logger.w(

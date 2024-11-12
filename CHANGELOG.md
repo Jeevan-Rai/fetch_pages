@@ -23,8 +23,27 @@
 
 ### 1.0.1
 
-* Bug fix - resolved issue in getting page from cache
+* Bug fix - resolved issue in getting page from cache.
 
 ### 1.0.2
 
-* Bug fix - can use x.x.x for versioning in versionConfig.json
+* Bug fix - can use `x.x.x` versioning format in `versionConfig.json`.
+
+### 1.1.0
+
+* Added support for version-mapping based on appVersion.
+* Enhanced versioning flow by using `version-mapping` endpoint to fetch version-specific folder names for page fetching.
+* Updated API routes to fetch pages based on folder names tied to app versions.
+
+### 1.1.1
+
+* Bug fix - resolved issue in fetching version-mapping on some servers.
+
+### 1.2.0
+
+* Added support for folder-based page fetching using directory structure to improve scalability.
+* Optimized JSON parsing and caching logic for large datasets.
+
+### 1.2.1
+
+* Bug fix - resolved issue in fetching pages while there is no local versioning
